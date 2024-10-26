@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+        .calculator {
+            width: 100%;
+            max-width: 320px;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #e9ecef;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .display {
+            width: 100%;
+            height: 60px;
+            font-size: 2em;
+            text-align: right;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #ced4da;
+            color: #333;
+            overflow: hidden;
+        }
+        .btn-calc {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5em;
+            border-radius: 8px;
+            margin: 5px;
+            background-color: #6c757d;
+            color: #fff;
+        }
+        .btn-operator {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .btn-clear {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .btn-equal {
+            background-color: #28a745;
+            color: #fff;
+            height: 60px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator text-center">
+        <div class="display" id="display">0</div>
+        <div class="d-flex flex-wrap justify-content-center">
+            <button class="btn btn-secondary btn-calc btn-clear" onclick="clearDisplay()">C</button>
+            <button class="btn btn-secondary btn-calc" onclick="setOperator('%')">%</button>
+            <button class="btn btn-primary btn-calc btn-operator" onclick="setOperator('/')">/</button>
+            <button class="btn btn-primary btn-calc btn-operator" onclick="setOperator('*')">X</button>
+
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(7)">7</button>
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(8)">8</button>
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(9)">9</button>
+            <button class="btn btn-primary btn-calc btn-operator" onclick="setOperator('-')">-</button>
+
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(4)">4</button>
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(5)">5</button>
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(6)">6</button>
+            <button class="btn btn-primary btn-calc btn-operator" onclick="setOperator('+')">+</button>
+
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(1)">1</button>
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(2)">2</button>
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(3)">3</button>
+            <button class="btn btn-success btn-calc btn-equal" onclick="calculate()">=</button>
+
+            <button class="btn btn-secondary btn-calc" onclick="appendNumber(0)">0</button>
+            <button class="btn btn-secondary btn-calc" onclick="appendDecimal()">.</button>
+        </div>
+    </div>
+
+    <script>
+        let displayValue = '0';
+        let firstOperand = null;
+        let operator = null;
+        let waitForSecondOperand = false;
+
+        function updateDisplay() {
+            document.getElementById('display').innerText = displayValue;
+        }
+
+        function appendNumber(number) {
+            if (waitForSecondOperand) {
+                displayValue = String(number);
+                waitForSecondOperand = false;
+            } else {
+                displayValue = displayValue === '0' ? String(number) : displayValue + number;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (waitForSecondOperand) return;
+            if (!displayValue.includes('.')) {
+                displayValue += '.';
+            }
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            displayValue = '0';
+            firstOperand = null;
+            operator = null;
+            waitForSecondOperand = false;
+            updateDisplay();
+        }
+
+        function setOperator(nextOperator) {
+            if (firstOperand === null) {
+                firstOperand = parseFloat(displayValue);
+            } else if (operator) {
+                const result = performCalculation[operator](firstOperand, parseFloat(displayValue));
+                displayValue = String(result);
+                firstOperand = result;
+            }
+            operator = nextOperator;
+            waitForSecondOperand = true;
+            updateDisplay();
+        }
+
+        function calculate() {
+            if (operator && !waitForSecondOperand) {
+                const result = performCalculation[operator](firstOperand, parseFloat(displayValue));
+                displayValue = String(result);
+                firstOperand = result;
+                operator = null;
+                waitForSecondOperand = true;
+                updateDisplay();
+            }
+        }
+
+        const performCalculation = {
+            '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
+            '-': (firstOperand, secondOperand) => firstOperand - secondOperand,
+            '*': (firstOperand, secondOperand) => firstOperand * secondOperand,
+            '/': (firstOperand, secondOperand) => firstOperand / secondOperand,
+            '%': (firstOperand, secondOperand) => firstOperand % secondOperand,
+        };
+    </script>
+
+</body>
+</html>
